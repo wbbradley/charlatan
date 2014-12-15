@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import datetime
+from uuid import uuid4
 
 import yaml
 from yaml.constructor import Constructor
@@ -39,6 +40,10 @@ def configure_yaml():
 
         return now
 
+    def uuid4_constructor(loader, node):
+        """Return an UUID4."""
+        return uuid4()
+
     def epoch_now_constructor(loader, node):
         """Return the current datetime as seconds since the epoch"""
 
@@ -55,6 +60,7 @@ def configure_yaml():
     yaml.add_constructor(u'!now', now_constructor)
     yaml.add_constructor(u'!epoch_now', epoch_now_constructor)
     yaml.add_constructor(u'!rel', relationship_constructor)
+    yaml.add_constructor(u'!uuid4', uuid4_constructor)
 
 
 def configure_output(use_unicode=False):
