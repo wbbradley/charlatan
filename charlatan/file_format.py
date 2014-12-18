@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import datetime
+import pytz
 from uuid import uuid4
-
 import yaml
 from yaml.constructor import Constructor
 
@@ -40,6 +40,17 @@ def configure_yaml():
 
         return now
 
+    def utcnow_constructor(loader, node):
+        """Return the current datetime."""
+
+        delta = loader.construct_scalar(node)
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        if delta:
+            now = apply_delta(now, delta)
+
+        return now
+
     def uuid4_constructor(loader, node):
         """Return an UUID4."""
         return uuid4()
@@ -58,6 +69,7 @@ def configure_yaml():
         return RelationshipToken(name)
 
     yaml.add_constructor(u'!now', now_constructor)
+    yaml.add_constructor(u'!utcnow', utcnow_constructor)
     yaml.add_constructor(u'!epoch_now', epoch_now_constructor)
     yaml.add_constructor(u'!rel', relationship_constructor)
     yaml.add_constructor(u'!uuid4', uuid4_constructor)
